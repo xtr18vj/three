@@ -10,6 +10,57 @@
   </style>
 </head>
 <body>
-    <h1>rutik is c</h1>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/examples/js/controls/OrbitControls.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/examples/js/loaders/GLTFLoader.js"></script>
+
+  <script>
+    // Scene setup
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.body.appendChild(renderer.domElement);
+
+    // OrbitControls setup
+    const controls = new THREE.OrbitControls(camera, renderer.domElement);
+
+    // Light setup
+    const light = new THREE.AmbientLight(0x404040, 2); // Ambient light
+    scene.add(light);
+
+    // Load the Earth GLTF model
+    const loader = new THREE.GLTFLoader();
+    loader.load('https://cdn.jsdelivr.net/gh/aframevr/aframe/examples/asset/earth/earth.gltf', function(gltf) {
+      scene.add(gltf.scene);
+      gltf.scene.scale.set(1, 1, 1); // Scale the model if necessary
+      gltf.scene.position.set(0, 0, 0); // Adjust position if needed
+    }, undefined, function(error) {
+      console.error(error);
+    });
+
+    // Camera position
+    camera.position.set(0, 1, 5);
+
+    // Animation loop
+    function animate() {
+      requestAnimationFrame(animate);
+
+      // Update controls (for orbiting)
+      controls.update();
+
+      // Rendering the scene
+      renderer.render(scene, camera);
+    }
+
+    animate();
+
+    // Resize handling
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+  </script>
 </body>
 </html>
