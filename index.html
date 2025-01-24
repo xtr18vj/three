@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Three.js Cube Example</title>
+  <title>Three.js Earth GLTF Loader with OrbitControls</title>
   <style>
     body { margin: 0; overflow: hidden; }
     canvas { display: block; }
@@ -11,6 +11,9 @@
 </head>
 <body>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/examples/js/controls/OrbitControls.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/examples/js/loaders/GLTFLoader.js"></script>
+
   <script>
     // Scene setup
     const scene = new THREE.Scene();
@@ -19,28 +22,45 @@
     renderer.setSize(window.innerWidth, window.innerHeight);
     document.body.appendChild(renderer.domElement);
 
-    // Cube setup
-    const geometry = new THREE.BoxGeometry();
-    const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
-    const cube = new THREE.Mesh(geometry, material);
-    scene.add(cube);
+    // OrbitControls setup
+    const controls = new THREE.OrbitControls(camera, renderer.domElement);
+
+    // Light setup
+    const light = new THREE.AmbientLight(0x404040, 2); // Ambient light
+    scene.add(light);
+
+    // Load the Earth GLTF model
+    const loader = new THREE.GLTFLoader();
+    loader.load('', function(gltf) {
+      scene.add(gltf.scene);
+      gltf.scene.scale.set(1, 1, 1); // Scale the model if necessary
+      gltf.scene.position.set(0, 0, 0); // Adjust position if needed
+    }, undefined, function(error) {
+      console.error(error);
+    });
 
     // Camera position
-    camera.position.z = 5;
+    camera.position.set(0, 1, 5);
 
     // Animation loop
     function animate() {
       requestAnimationFrame(animate);
 
-      // Rotation of the cube
-      cube.rotation.x += 0.01;
-      cube.rotation.y += 0.01;
+      // Update controls (for orbiting)
+      controls.update();
 
       // Rendering the scene
       renderer.render(scene, camera);
     }
 
     animate();
+
+    // Resize handling
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
   </script>
 </body>
 </html>
